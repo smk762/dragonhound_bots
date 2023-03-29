@@ -20,6 +20,8 @@ ping_ids = {
     }
 }
 
+
+
 @client.event
 async def on_ready():
     for guild in client.guilds:
@@ -29,28 +31,56 @@ async def on_ready():
     print(f'{client.user} is connected to {guild.name} (id: {guild.id})')
     channel = client.get_channel(CHANNEL)
     try:
-        msg = ""
+        failing_coins = {}
         status_data = requests.get("https://electrum-status.dragonhound.info/api/v1/electrums_status").json()
+
         for i in status_data:
             if i["status"] == "Failing":
-                ping_id = ""
-                last_conn = "never"
-                if i["electrum"] in ping_ids:
-                    ping_id = ping_ids[i["electrum"]]["discord_id"]
+
+                last_conn = "Never"
                 if i["last_connection"]:
-                    last_conn = dt.fromtimestamp(i["last_connection"])
-                msg += f'[{i["coin"]}] {i["electrum"]} failing! {i["response"]}. Last connection: {last_conn} UTC. {ping_id}\n'
-                if len(msg) > 1800:
+                    last_conn = f'{dt.fromtimestamp(i["last_connection"])} UTC'
+
+                coin = i["coin"]
+                if coin not in failing_coins:
+                    failing_coins.update({coin: []})
+
+                ping = None
+                if i["electrum"] in ping_ids:
+                    ping = ping_ids[i["electrum"]]["discord_id"]
+
+                msg = '{:<12}'.format(f'[{coin}]')
+                msg += '{:<48}'.format(f'{i["electrum"]}')
+                msg += '{:<124}'.format(f'{i["response"][:120]}')
+                msg += f'Last: {last_conn}\n'
+
+                failing_coins[coin].append({"msg": msg, "ping": ping})
+
+        failed_coins_list = list(failing_coins.keys())
+        failed_coins_list.sort()
+
+        msg = ""
+        pingums = []
+        for coin in failed_coins_list:
+            for i in failing_coins[coin]:
+                if i["ping"]:
+                    pingums.append(i["ping"])
+
+                msg += i["msg"]
+                if len(msg) > 1700:
+                    msg = f"{' '.join(pingums)}\n```\n{msg}\n```"
                     await channel.send(msg)
                     msg = ""
+                    pingums = []
 
-        if len(msg) > 0:
+        if msg != "":
+            msg = f"{' '.join(pingums)}\n```\n{msg}\n```"
             await channel.send(msg)
-            msg = ""
+
 
         await client.close()
     except Exception as e:
-        await channel.send(f'<@448777271701143562> Check https://stats.kmd.io/atomicdex/electrum_status/ it apears to be unresponsive: {e}')
+        await channel.send(f'<@448777271701143562> Check <https://stats.kmd.io/atomicdex/electrum_status/> - it appears to be unresponsive: {e}')
         await client.close()
 
 
