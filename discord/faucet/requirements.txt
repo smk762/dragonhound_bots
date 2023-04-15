@@ -1,0 +1,6 @@
+discord.py==2.2.2
+python-dotenv==1.0.0
+requests==2.23.0
+virtualenv==20.21.0
+mnemonic==0.20
+

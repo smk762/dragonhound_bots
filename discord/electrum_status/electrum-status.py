@@ -4,6 +4,7 @@ import discord
 import requests
 from datetime import datetime as dt
 from dotenv import load_dotenv
+from lib_const import ping_ids
 
 load_dotenv()
 TOKEN = os.getenv('ELECTRUM_STATUS_DISCORD_TOKEN')
@@ -12,14 +13,6 @@ CHANNEL = int(os.getenv('ELECTRUM_STATUS_CHANNEL'))
 
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
-
-ping_ids = {
-    "electrumx.nvc.ewmcx.org:50002": {
-        "discord_user": "smk",
-        "discord_id": "<@448777271701143562>"
-    }
-}
-
 
 
 @client.event
