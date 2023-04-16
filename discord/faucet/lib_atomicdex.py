@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
+import json
 import requests
 from dotenv import load_dotenv
 
 load_dotenv()
-ATOMICDEX_USERPASS = os.getenv('ATOMICDEX_USERPASS')
-ATOMICDEX_IP = os.getenv('ATOMICDEX_IP')
+
+ACTIVATION_PARAMS = requests.get("http://116.203.120.91:8762/api/atomicdex/coin_activation_commands/").json()
+with open("atomicdex/MM2.json", "r") as f:
+    conf = json.load(f)
+    ATOMICDEX_USERPASS = conf["rpc_password"]
+    ATOMICDEX_IP = conf["rpc_ip"]
 
 
 def atomicdex_proxy(params):
@@ -28,7 +33,6 @@ def stop_atomicdex():
     resp = atomicdex_proxy(params)
     return resp
   
-
 
 # https://developers.komodoplatform.com/basic-docs/atomicdex-api-legacy/my_balance.html
 def get_balance(coin):
