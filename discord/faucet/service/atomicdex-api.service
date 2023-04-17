@@ -6,18 +6,18 @@ StartLimitIntervalSec=60
 StartLimitBurst=5
 
 [Service]
-User=smk762
-Group=smk762
+User=explorer
+Group=explorer
 Type=simple
 
 # Logs path
-StandardOutput=append:/home/smk762/logs/atomicdex-api.log
-StandardError=append:/home/smk762/logs/atomicdex-api.log
+StandardOutput=append:/home/explorer/logs/atomicdex-api.log
+StandardError=append:/home/explorer/logs/atomicdex-api.log
 
-Environment=MM_CONF_PATH=/home/smk762/GITHUB/SMK/dragonhound_bots/discord/faucet/atomicdex/MM2.json
-Environment=MM_COINS_PATH=/home/smk762/GITHUB/SMK/dragonhound_bots/discord/faucet/atomicdex/coins
-ExecStart=/home/smk762/GITHUB/SMK/dragonhound_bots/discord/faucet/atomicdex/mm2
-WorkingDirectory=/home/smk762/GITHUB/SMK/dragonhound_bots/discord/faucet/
+Environment=MM_CONF_PATH=/home/explorer/dragonhound_bots/discord/faucet/atomicdex/MM2.json
+Environment=MM_COINS_PATH=/home/explorer/dragonhound_bots/discord/faucet/atomicdex/coins
+ExecStart=/home/explorer/dragonhound_bots/discord/faucet/atomicdex/mm2
+WorkingDirectory=/home/explorer/dragonhound_bots/discord/faucet/
 
 Restart=on-failure
 RestartSec=10s
