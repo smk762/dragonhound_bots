@@ -63,7 +63,7 @@ async def drip(coin: str, address: str, request: Request):
     txid = faucet.drip(coin, address, amount)
     if "error" in txid:
         return txid["error"]
-    else:
+    elif 'tx_hash' in txid:
         explorer_url = urls.get_explorer_url(coin, address=address, txid=txid['tx_hash'])
         response = lib_faucet.get_faucet_response(coin, amount, address, txid['tx_hash'])
         values = (coin, address, amount, txid['tx_hash'], explorer_url, int(time.time()))
@@ -77,7 +77,10 @@ async def drip(coin: str, address: str, request: Request):
             },
             "status": "success"
         }
-        return response
+    else:
+        print(txid)
+        return txid
+
 
 
 @app.get("/show_faucet_db")

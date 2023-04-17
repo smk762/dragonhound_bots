@@ -182,7 +182,6 @@ class Faucet():
             txid = self.send_raw_tx(coin, tx_hex)
             return txid
         else:
-
             return {
                 "result": {
                     "coin": coin,
