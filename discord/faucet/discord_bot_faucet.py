@@ -55,11 +55,7 @@ async def faucet_drip(ctx, coin: str, address: str):
             await ctx.response.send_message(txid["error"])
         else:
             explorer_url = urls.get_explorer_url(coin, txid=txid['tx_hash'])
-            response = f"`Sent {amount} {coin} to {address}`"
-            if explorer_url:
-                response += f" Link: <{explorer_url}>"
-            else:
-                response += f" Txid: <{txid['tx_hash']}>"
+            response += lib_faucet.get_faucet_response(coin, amount, address, txid['tx_hash'])
             values = (coin, address, amount, txid['tx_hash'], explorer_url, int(time.time()))
             db.update_faucet_db(values)
             await ctx.response.send_message(response, delete_after=3600)
