@@ -165,10 +165,11 @@ class Faucet():
 
 
 
-
     def activate_faucet_coins(self):
+        enabled = self.get_enabled_coins()
         for coin in const.get_faucet_coins():
-            self.activate_coin(coin)
+            if coin not in enabled:
+                self.activate_coin(coin)
 
 
     def drip(self, coin, address, amount):
@@ -218,7 +219,9 @@ class Faucet():
 
     def get_enabled_coins(self):
         ''' Returns a list of enabled coins. '''
-        return [i["ticker"] for i in self.rpc({"method": "enabled_coins"}).json()["result"]]
+        enabled = self.rpc({"method": "get_enabled_coins"})
+        print(enabled)
+        return [i["ticker"] for i in enabled["result"]]
 
 
 ##### Non Class Methods #####

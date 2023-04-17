@@ -4,10 +4,7 @@ mkdir -p ~/logs
 mkdir atomicdex
 echo "Installing dependencies..."
 sudo apt-get update
-sudo apt-get install -y python3 python3-pip python3-venv nginx curl libcurl4-openssl-dev libssl-dev
-pip3 install virtualenv==20.21.0
-virtualenv .venv
-source .venv/bin/activate
+sudo apt-get install -y python3 python3-pip python3-venv nginx curl libcurl4-openssl-dev libssl-dev jq
 pip3 install -r requirements.txt
 
 echo "Configuring environment..."
@@ -19,14 +16,20 @@ echo "Setting up AtomicDEX-API..."
 ./update_atomicdex.sh
 SCRIPT_PATH=$(pwd)
 
+
 echo "Setting up FastAPI..."
 ./configure.py nginx
-sudo certbot certonly -d $(./const get_subdomain)
+subdomain=$(python3 ./const.py get_subdomain)
+sudo certbot certonly -d ${subdomain}
+./configure.py ssl_env
+sudo cp nginx/fastapi-faucet.serverblock /etc/nginx/sites-available/${subdomain}
+sudo ln -s /etc/nginx/sites-available/${subdomain} /etc/nginx/sites-enabled/${subdomain}
+sudo systemctl restart nginx
 
 echo "Creating service files..."
 cp service/TEMPLATE-atomicdex.service service/atomicdex-api.service
 cp service/TEMPLATE-discord-bot.service service/discord-bot-faucet.service
-cp service/TEMPLATE-atomicdex.service service/fastapi-faucet.service
+cp service/TEMPLATE-fastapi.service service/fastapi-faucet.service
 
 sed "s|SCRIPT_PATH|${SCRIPT_PATH}|g" -i "service/atomicdex-api.service"
 sed "s|SCRIPT_PATH|${SCRIPT_PATH}|g" -i "service/discord-bot-faucet.service"

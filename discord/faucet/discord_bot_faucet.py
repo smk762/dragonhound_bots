@@ -41,7 +41,7 @@ async def faucet_help(ctx):
     response += f"/faucet-swaps-active               - Shows active swaps for faucet\n"
     response += f"/faucet-swaps-recent               - Shows recent swaps for faucet\n"
     response += f"```"
-    await ctx.response.channel.send_message(response)
+    await ctx.response.send_message(response)
 
 
 @tree.command(name='faucet-drip', description='Sends funds from the faucet')

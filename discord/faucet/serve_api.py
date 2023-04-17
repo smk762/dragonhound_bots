@@ -41,6 +41,7 @@ app.add_middleware(
 @app.on_event("startup")
 @repeat_every(seconds=60)
 def ensure_orders():
+    faucet.activate_faucet_coins.sh
     faucet.update_testcoin_orders()
 
 @app.get("/")
@@ -112,7 +113,7 @@ if __name__ == "__main__":
     SSL_KEY, SSL_CERT = const.get_ssl_certs()
     API_PORT = const.get_api_port()
 
-    if SSL_KEY != "" and SSL_CERT != "":
+    if SSL_KEY != "" and SSL_CERT != "" and 1==0:
         uvicorn.run("serve_api:app", host="127.0.0.1", port=API_PORT, ssl_keyfile=SSL_KEY, ssl_certfile=SSL_CERT, reload=True)
     else:
         uvicorn.run("serve_api:app", host="0.0.0.0", port=API_PORT, reload=True)

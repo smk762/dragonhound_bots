@@ -2,7 +2,9 @@ import os
 import sys
 from dotenv import load_dotenv, find_dotenv
 
-load_dotenv(find_dotenv())
+#load_dotenv(find_dotenv())
+load_dotenv()
+
 
 def get_api_port():
     ''' Returns the port for the API. '''

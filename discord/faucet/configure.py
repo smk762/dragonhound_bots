@@ -61,7 +61,7 @@ def configure_atomicdex(path=None):
     print(f"{path}MM2.json file created.")
 
     with open(f"{path}userpass", "w+") as f:
-        f.write(f'{path}userpass="{rpc_password}"')
+        f.write(f'{path}userpass="{ATOMICDEX_USERPASS}"')
     print(f"{path}userpass file created.")
     print("AtomicDEX configured successfully!")
 
@@ -85,8 +85,12 @@ def check_dotenv():
                 "ATOMICDEX_PORT", "ATOMICDEX_IP",
                 'SSL_KEY', 'SSL_CERT', 'FASTAPI_PORT',
                 "SUBDOMAIN", "DB_PATH", "WEBROOT",
-                "NGINX_PROXY_HOST"
+                "NGINX_PROXY_HOST", "FAUCET_COINS",
+                "DISCORD_TOKEN"
     ]
+    if not os.path.exists(".env"):
+        with open(".env", "w") as f:
+            f.write("")
     with open(".env", "r+") as f:
         existing_vars = [k.split("=")[0] for k in f.readlines()]
         print(existing_vars)
@@ -105,7 +109,9 @@ def check_dotenv():
                 elif var == "WEBROOT":
                     home = os.path.expanduser("~")
                     val = f"{home}/fastapi"
-                    os.makedirs(webroot, exist_ok=True)
+                    os.makedirs(val, exist_ok=True)
+                elif var == "FAUCET_COINS":
+                    val = "RICK MORTY DOC MARTY ZOMBIE"
                 elif var == "FASTAPI_PORT":
                     val = 8077
                 elif var == "NGINX_PROXY_HOST":
@@ -139,6 +145,20 @@ def create_serverblock():
     print(f"Then restart nginx with 'sudo systemctl restart nginx'")
 
 
+
+
+def update_ssl_env():
+    with open('.env', 'r', encoding='utf-8') as f:
+        data = f.readlines()
+        for i in range(len(data)):
+            if data[i].find("SSL_KEY") != -1:
+                data[i] = f'SSL_KEY="/etc/letsencrypt/live/{os.getenv("SUBDOMAIN")}/privkey.pem"\n'
+            elif data[i].find("SSL_CERT") != -1:
+                data[i] = f'SSL_CERT="/etc/letsencrypt/live/{os.getenv("SUBDOMAIN")}/fullchain.pem"\n'
+    with open('.env', 'w', encoding='utf-8') as f:
+        f.writelines(data)
+
+
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         if sys.argv[1] == "env_vars":
@@ -147,6 +167,8 @@ if __name__ == "__main__":
             configure_atomicdex('atomicdex')
         elif sys.argv[1] == "nginx":
             create_serverblock()
+        elif sys.argv[1] == "ssl_env":
+            update_ssl_env()
         else:
             print("Unknown argument")
 
