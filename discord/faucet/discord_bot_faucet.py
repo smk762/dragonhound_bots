@@ -52,7 +52,7 @@ async def faucet_drip(ctx, coin: str, address: str):
         amount = str(random.randint(1, 1000)/200)
         txid = faucet.drip(coin, address, amount)
         if 'tx_hash' in txid:
-            explorer_url = urls.get_explorer_url(coin, txid=txid['tx_hash'])
+            explorer_url = urls.get_explorer_url(coin, address, txid=txid['tx_hash'])
             response += lib_faucet.get_faucet_response(coin, amount, address, txid['tx_hash'])
             values = (coin, address, amount, txid['tx_hash'], explorer_url, int(time.time()))
             db.update_faucet_db(values)

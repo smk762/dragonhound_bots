@@ -227,7 +227,7 @@ class Faucet():
 
 def get_faucet_response(coin, amount, address, txid):
     print(txid)
-    explorer_url = urls.get_explorer_url(coin, txid)
+    explorer_url = urls.get_explorer_url(coin, address, txid)
     response = f"Sent {amount} {coin} to {address}!"
 
     if explorer_url:
