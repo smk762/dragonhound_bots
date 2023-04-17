@@ -6,12 +6,8 @@ EXPLORERS = requests.get("https://stats.kmd.io/api/info/explorers/").json()
 def get_explorer_url(coin, address=None, txid=None, endpoint=None):
     if coin in EXPLORERS["results"]:
         explorer = EXPLORERS["results"][coin][0]
-        if address:
-            if not endpoint:
-                endpoint = "address"
-        if txid:
-            if not endpoint:
-                endpoint = "tx"
+        if not endpoint:
+            endpoint = "tx"
         return f"{explorer}{endpoint}/{txid}"
     else:
         return None

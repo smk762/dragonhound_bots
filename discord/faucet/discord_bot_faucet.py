@@ -51,14 +51,14 @@ async def faucet_drip(ctx, coin: str, address: str):
     else:
         amount = str(random.randint(1, 1000)/200)
         txid = faucet.drip(coin, address, amount)
-        if "error" in txid:
-            await ctx.response.send_message(txid["error"])
-        else:
+        if 'tx_hash' in txid:
             explorer_url = urls.get_explorer_url(coin, txid=txid['tx_hash'])
             response += lib_faucet.get_faucet_response(coin, amount, address, txid['tx_hash'])
             values = (coin, address, amount, txid['tx_hash'], explorer_url, int(time.time()))
             db.update_faucet_db(values)
-            await ctx.response.send_message(response, delete_after=3600)
+        else:
+            response = f"Error: {txid}"
+        await ctx.response.send_message(response, delete_after=3600)
 
 
 @tree.command(name='faucet-recent', description='Shows faucet funds distributed in the last 24 hours')
