@@ -1,4 +1,5 @@
 #!/bin/bash
+mkdir -p atomicdex
 cd atomicdex
 rm mm2
 rm coins

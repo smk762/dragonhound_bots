@@ -6,11 +6,11 @@ import discord # https://discordpy.readthedocs.io/
 from discord import app_commands
 from datetime import datetime as dt
 from dotenv import load_dotenv
-import lib_atomicdex as atomicdex
-import lib_faucet
-import lib_urls as urls
-import lib_sqlite as db
-import const
+import lib.faucet
+import lib.urls as urls
+import lib.sqlite as db
+import lib.const as const
+from lib.logger import logger
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -19,12 +19,12 @@ intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
-faucet = lib_faucet.Faucet(os.getenv('ATOMICDEX_IP'), os.getenv('ATOMICDEX_PORT'), os.getenv('ATOMICDEX_USERPASS'))
+faucet = lib.faucet.Faucet(os.getenv('ATOMICDEX_IP'), os.getenv('ATOMICDEX_PORT'), os.getenv('ATOMICDEX_USERPASS'))
 
 @client.event
 async def on_ready():
     await tree.sync()
-    print("Ready!")
+    logger.info(f'{client.user} has connected to Discord!')
 
 # @tree.command(name = "commandname", description = "My first application Command", guild=discord.Object(id=12417128931))
 # #Add the guild ids in which the slash command will appear. If it should be in all, remove the argument, but note that it will take some time (up to an hour) to register the command if it's for all guilds.
@@ -53,7 +53,7 @@ async def faucet_drip(ctx, coin: str, address: str):
         txid = faucet.drip(coin, address, amount)
         if 'tx_hash' in txid:
             explorer_url = urls.get_explorer_url(coin, address, txid=txid['tx_hash'])
-            response += lib_faucet.get_faucet_response(coin, amount, address, txid['tx_hash'])
+            response += lib.faucet.get_faucet_response(coin, amount, address, txid['tx_hash'])
             values = (coin, address, amount, txid['tx_hash'], explorer_url, int(time.time()))
             db.update_faucet_db(values)
         else:
@@ -68,7 +68,6 @@ async def faucet_recent(ctx):
     for coin in const.get_faucet_coins():
         sum_drips.update({coin: 0})
     for drip in drips:
-        print(drip)
         coin = drip[1]
         amount = drip[3]
         sum_drips[coin] += float(amount)
@@ -85,7 +84,6 @@ async def faucet_balances(ctx):
     balances = faucet.get_balances()
     response = ""
     for i in balances:
-        print(i)
         if "error" in i:
             response=f"Error: {i['error']}"
         else:
@@ -136,7 +134,6 @@ async def faucet_swaps_recent(ctx):
 async def faucet_swaps_active(ctx):
     swaps = faucet.get_active_swaps()
     if not "error" in swaps:
-        print(swaps)
         swaps = swaps["statuses"]
         if len(swaps) > 0:
             rows = f"```\n| {'UUID'.center(40)} | {'PAIR'.center(20)} | {'Maker Amount'.center(12)} | {'Taker Amount'.center(12)} |\n"
@@ -159,11 +156,11 @@ async def atomicdex_orderbook(ctx, base: str, rel: str):
     rel = rel.upper()
     orderbook = faucet.get_orderbook(base, rel)
     if not "error" in orderbook:
-        bids_response = lib_faucet.get_orderbook_rows(orderbook["bids"], rel)
-        asks_response = lib_faucet.get_orderbook_rows(orderbook["asks"], base)
-        response = lib_faucet.get_orderbook_headers(base, rel)
-        response += lib_faucet.get_orderbook_subheaders(orderbook["asks"], orderbook["bids"])
-        response += lib_faucet.get_orders_tabledata(asks_response, bids_response)
+        bids_response = lib.faucet.get_orderbook_rows(orderbook["bids"], rel)
+        asks_response = lib.faucet.get_orderbook_rows(orderbook["asks"], base)
+        response = lib.faucet.get_orderbook_headers(base, rel)
+        response += lib.faucet.get_orderbook_subheaders(orderbook["asks"], orderbook["bids"])
+        response += lib.faucet.get_orders_tabledata(asks_response, bids_response)
         await ctx.response.send_message(response, delete_after=300)
     else:
         await ctx.response.send_message(orderbook["error"], delete_after=60, ephemeral=True)

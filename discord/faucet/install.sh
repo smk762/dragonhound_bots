@@ -8,20 +8,20 @@ sudo apt-get install -y python3 python3-pip python3-venv nginx curl libcurl4-ope
 pip3 install -r requirements.txt
 
 echo "Configuring environment..."
-./configure.py env_vars
+./lib/configure.py env_vars
 
 echo "Setting up AtomicDEX-API..."
-./configure.py atomicdex
+./lib/configure.py atomicdex
 ./stop_atomicdex.sh
 ./update_atomicdex.sh
 SCRIPT_PATH=$(pwd)
 
 
 echo "Setting up FastAPI..."
-./configure.py nginx
-subdomain=$(python3 ./const.py get_subdomain)
+./lib/configure.py nginx
+subdomain=$(python3 ./lib/const.py get_subdomain)
 sudo certbot certonly -d ${subdomain}
-./configure.py ssl_env
+./lib/configure.py ssl_env
 sudo cp nginx/fastapi-faucet.serverblock /etc/nginx/sites-available/${subdomain}
 sudo ln -s /etc/nginx/sites-available/${subdomain} /etc/nginx/sites-enabled/${subdomain}
 sudo systemctl restart nginx

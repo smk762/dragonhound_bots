@@ -1,29 +1,22 @@
 #!/usr/bin/env python3
 import time
 import random
+import logging
 import uvicorn
 from typing import Optional
-import logging
-from logging.config import dictConfig
 from fastapi import FastAPI, Request
 from fastapi_utils.tasks import repeat_every
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv, find_dotenv
 
-import const
-import lib_faucet
-import lib_urls as urls
-import lib_sqlite as db
-from config_logger import LogConfig
-
-
-# Logging config
-dictConfig(LogConfig().dict())
-logger = logging.getLogger("atomicdex_faucet")
+import lib.const as const
+import lib.faucet
+import lib.urls as urls
+import lib.sqlite as db
 
 
 # Init FaucetRPC
-faucet = lib_faucet.get_faucet()
+faucet = lib.faucet.get_faucet()
 faucet_coins = const.get_faucet_coins()
 
 
@@ -65,7 +58,7 @@ async def drip(coin: str, address: str, request: Request):
         return txid["error"]
     elif 'tx_hash' in txid:
         explorer_url = urls.get_explorer_url(coin, address, txid=txid['tx_hash'])
-        response = lib_faucet.get_faucet_response(coin, amount, address, txid['tx_hash'])
+        response = lib.faucet.get_faucet_response(coin, amount, address, txid['tx_hash'])
         values = (coin, address, amount, txid['tx_hash'], explorer_url, int(time.time()))
         db.update_faucet_db(values)
         return {
@@ -78,7 +71,6 @@ async def drip(coin: str, address: str, request: Request):
             "status": "success"
         }
     else:
-        print(txid)
         return txid
 
 
@@ -117,7 +109,7 @@ if __name__ == "__main__":
     API_PORT = const.get_api_port()
 
     if SSL_KEY != "" and SSL_CERT != "" and 1==0:
-        uvicorn.run("serve_api:app", host="127.0.0.1", port=API_PORT, ssl_keyfile=SSL_KEY, ssl_certfile=SSL_CERT, reload=True)
+        uvicorn.run("faucet_fastapi:app", host="127.0.0.1", port=API_PORT, ssl_keyfile=SSL_KEY, ssl_certfile=SSL_CERT, reload=True)
     else:
-        uvicorn.run("serve_api:app", host="0.0.0.0", port=API_PORT, reload=True)
+        uvicorn.run("faucet_fastapi:app", host="0.0.0.0", port=API_PORT, reload=True)
 

@@ -1,5 +1,14 @@
-## Install Dependencies:
-- `pip3 install -r requirements.txt`
+## Installation
+
+Run the `./install` script to:
+- install the required python packages & apt packages
+- Create & populate a .env file.
+- Setup systemd services for the bot, api and atomicdex.
+- Generate a self-signed SSL certificate for the api.
+- Create an Nginx server block for the api.
+
+The .env contains the following:
+
 
 
 ## Usage
