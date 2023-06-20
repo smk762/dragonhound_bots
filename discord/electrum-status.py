@@ -14,7 +14,7 @@ intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 
 ping_ids = {
-    "electrumx.nvc.ewmcx.org:50002": {
+    "electrum.server:50000": {
         "discord_user": "smk",
         "discord_id": "<@448777271701143562>"
     }
