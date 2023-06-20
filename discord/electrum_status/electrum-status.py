@@ -4,6 +4,7 @@ import discord
 import requests
 from datetime import datetime as dt
 from dotenv import load_dotenv
+from lib_const import ping_ids
 
 load_dotenv()
 TOKEN = os.getenv('ELECTRUM_STATUS_DISCORD_TOKEN')
@@ -19,7 +20,6 @@ ping_ids = {
         "discord_id": "<@448777271701143562>"
     }
 }
-
 
 
 @client.event

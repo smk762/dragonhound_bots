@@ -1,0 +1,28 @@
+[Unit]
+Description=fastapi-faucet
+Wants=network-online.target
+After=network-online.target
+Conflicts=getty@tty1.service
+After=network.target atomicDEX-API.service
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+WorkingDirectory=SCRIPT_PATH
+ExecStart=/usr/bin/python3 SCRIPT_PATH/serve_api.py
+
+# Logs path
+StandardOutput=append:/home/USERNAME/logs/fastapi-faucet.log
+StandardError=append:/home/USERNAME/logs/fastapi-faucet.log
+
+User=USERNAME
+Group=USERNAME
+Type=simple
+Restart=on-failure
+TimeoutStopSec=30min
+RestartSec=10s
+StandardInput=tty-force
+
+[Install]
+WantedBy=multi-user.target
+
