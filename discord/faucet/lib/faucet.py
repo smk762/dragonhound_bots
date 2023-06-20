@@ -17,6 +17,7 @@ class Faucet():
         self.atomicdex_ip = f"{atomicdex_ip}:{atomicdex_port}"
         self.atomicdex_userpass = atomicdex_userpass
         self.faucet_coins = {}
+        self.cancel_all_orders()
 
         # Activates coins if not already active.
         self.activate_faucet_coins()
@@ -119,7 +120,10 @@ class Faucet():
 
 
     def cancel_all_orders(self):
-        params = {"method": "cancel_all_orders"}
+        params = {
+            "method": "cancel_all_orders",
+            "cancel_by": {"type": "All"}
+        }
         return self.rpc(params)
 
 
@@ -158,7 +162,7 @@ class Faucet():
         for base in faucet_coins:
             for rel in faucet_coins:
                 if base != rel:
-                    price = 0.9762
+                    price = 1.2
                     volume = 1
                     response = self.setprice(base, rel, price, volume)
                     print(response)

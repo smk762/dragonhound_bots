@@ -32,7 +32,7 @@ def stop_atomicdex():
     params = {"method":"stop"}
     resp = atomicdex_proxy(params)
     return resp
-  
+
 
 # https://developers.komodoplatform.com/basic-docs/atomicdex-api-legacy/my_balance.html
 def get_balance(coin):

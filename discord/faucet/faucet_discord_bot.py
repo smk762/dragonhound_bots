@@ -46,6 +46,7 @@ async def faucet_help(ctx):
 
 @tree.command(name='faucet-drip', description='Sends funds from the faucet')
 async def faucet_drip(ctx, coin: str, address: str):
+    response = ""
     if coin not in const.get_faucet_coins():
         await ctx.response.send_message(f"Coin `{coin}` is not supported by this faucet", delete_after=60, ephemeral=True)
     else:
@@ -53,7 +54,7 @@ async def faucet_drip(ctx, coin: str, address: str):
         txid = faucet.drip(coin, address, amount)
         if 'tx_hash' in txid:
             explorer_url = urls.get_explorer_url(coin, address, txid=txid['tx_hash'])
-            response += lib.faucet.get_faucet_response(coin, amount, address, txid['tx_hash'])
+            response = lib.faucet.get_faucet_response(coin, amount, address, txid['tx_hash'])
             values = (coin, address, amount, txid['tx_hash'], explorer_url, int(time.time()))
             db.update_faucet_db(values)
         else:
