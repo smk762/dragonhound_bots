@@ -75,7 +75,7 @@ Once the container is running, expose it to the internet using a tool like ngrok
     curl -X POST "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook" -d "url=https://your-domain.com/emoji_webhook"
     ```
 
-Replace https://your-domain.com/<YOUR_BOT_TOKEN> with your server’s public HTTPS URL.
+Replace https://your-domain.com/emoji_webhook with your server’s public HTTPS URL.
 
 ## Running Locally for Development
 

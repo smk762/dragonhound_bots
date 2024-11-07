@@ -3,8 +3,8 @@ from fastapi import FastAPI, Request, HTTPException
 from requests.exceptions import RequestException
 import requests
 import random
-from .config import BOT_TOKEN, CHANNEL_WHITELIST, USER_WHITELIST
-from .emoji_keywords import EMOJI_KEYWORDS
+from config import BOT_TOKEN, CHANNEL_WHITELIST, USER_WHITELIST
+from emoji_keywords import EMOJI_KEYWORDS
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
