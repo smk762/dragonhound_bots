@@ -55,6 +55,20 @@ class Faucet():
         }
         return self.rpc(params)
 
+    def zhtlc_withdraw(self, coin, address, amount):
+        params = {
+            "mmrpc": "2.0",
+            "userpass": "MM2_RPC_PASSWORD",
+            "method": "task::withdraw::init",
+            "params": {
+                "coin": coin,
+                "to": address,
+                "amount": amount
+            },
+            "id": 0
+        }
+        return self.rpc(params)
+        
 
     def send_raw_tx(self, coin, tx_hex):
         params = {

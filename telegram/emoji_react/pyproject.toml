@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "emoji-react"
+version = "0.1.0"
+description = "A simple telegram api tool for emoji reactions"
+authors = ["smk762 <smk@komodoplatform.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.115.4"
+uvicorn = "^0.32.0"
+requests = "^2.32.3"
+python-dotenv = "^1.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
