@@ -1,5 +1,5 @@
 # Use an official Python image
-FROM python:3.9-slim as base
+FROM python:3.9-slim AS base
 
 # Install Poetry
 RUN pip install poetry

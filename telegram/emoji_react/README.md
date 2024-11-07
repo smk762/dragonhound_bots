@@ -65,7 +65,7 @@ Using Docker and Docker Compose
 1. **Build and Run the Docker Container**:
 
     ```bash
-    docker-compose up --build
+    docker compose up --build
     ```
 2. **Set Up Telegram Webhook**:
 
