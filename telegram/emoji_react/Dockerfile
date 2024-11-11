@@ -1,22 +1,22 @@
-# Use an official Python image
-FROM python:3.12-slim AS base
+# Use official Python image
+FROM python:3.12-slim
 
 # Install Poetry
 RUN pip install poetry
 
-# Set the working directory
+# Set working directory
 WORKDIR /app
 
-# Copy pyproject.toml and poetry.lock to install dependencies
+# Copy dependencies and install
 COPY app/pyproject.toml app/poetry.lock ./
 RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi
 
-# Copy the rest of the application code
+# Copy application code
 COPY app/ .
 
-# Expose the port FastAPI will run on
-EXPOSE 9524
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
 
-# Command to run the FastAPI application with Uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "9524"]
+# Run the bot
+CMD ["poetry", "run", "python", "main.py"]

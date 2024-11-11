@@ -1,54 +1,54 @@
+import sys
+from telethon import TelegramClient, events
+from telethon.tl.functions.messages import SendReactionRequest
+from telethon.tl.types import ReactionEmoji
+
+import asyncio
 import logging
-from fastapi import FastAPI, Request, HTTPException
-from requests.exceptions import RequestException
-import requests
 import random
-from config import BOT_TOKEN, CHANNEL_WHITELIST, USER_WHITELIST
+from config import API_ID, API_HASH, CHANNEL_WHITELIST, USER_WHITELIST, SESSION
 from emoji_keywords import EMOJI_KEYWORDS
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
-TELEGRAM_API_URL = f'https://api.telegram.org/bot{BOT_TOKEN}'
+async def main():
 
-def set_message_reaction(chat_id, message_id, emoji, is_add=True):
-    url = f"{TELEGRAM_API_URL}/setMessageReaction"
-    payload = {
-        'chat_id': chat_id,
-        'message_id': message_id,
-        'reaction': emoji,
-        'is_add': is_add
-    }
-    try:
-        response = requests.post(url, json=payload)
-        response.raise_for_status()
-        logger.info(f"Successfully reacted with {emoji} to message {message_id}")
-    except RequestException as e:
-        logger.error(f"Failed to react with {emoji} to message {message_id}: {e}")
-        raise HTTPException(status_code=503, detail="Telegram API is currently unavailable")
+    @events.register(events.NewMessage)
+    async def handler(event):
+        message_text = event.message.message.lower()
+        if event.from_id:
+            if event.from_id.user_id in USER_WHITELIST:
+                if event.peer_id.channel_id in CHANNEL_WHITELIST:
+                    message_text = event.message.message.lower()
+                    for keyword, emojis in EMOJI_KEYWORDS.items():
+                        if keyword in message_text:
+                            chosen_emojis = random.sample(emojis, 2)
+                            for emoji in chosen_emojis:
+                                await add_reaction(event, emoji)
+    
+    client = TelegramClient(session=SESSION, api_id=API_ID, api_hash=API_HASH)
+    async with client:
+        await client.start()
+        client.add_event_handler(handler)
+        me = await client.get_me()
+        username = me.username
+        print(f"Hello Professor {username}. How about a nice game of chess?")
+        print(f"Monitoring channels {CHANNEL_WHITELIST} for keywords {EMOJI_KEYWORDS.keys()} from users {USER_WHITELIST}")
+            
+        async def add_reaction(event, emoji):
+            await client(SendReactionRequest(
+                    peer=event.chat_id,
+                    msg_id=event.message.id,
+                    reaction=[ReactionEmoji(emoticon=emoji)]
+                )
+            )
+            logger.info(f"Added reaction '{emoji}' to message {event.message.id} in chat {event.chat_id}")
+        try:
+            await client.run_until_disconnected()
+        except KeyboardInterrupt:
+            print(f"Goodbye Professor {username}")
+            sys.exit(0)
 
-# Example handle_message logging improvements
-def handle_message(message):
-    user_id = message.get("from", {}).get("id")
-    chat_id = message.get("chat", {}).get("id")
-    message_id = message.get("message_id")
-    text = message.get("text", "")
-
-    if chat_id not in CHANNEL_WHITELIST or (user_id and user_id not in USER_WHITELIST):
-        logger.info(f"Ignoring message {message_id} from unlisted channel/user.")
-        return
-
-    for keyword, emojis in EMOJI_KEYWORDS.items():
-        if keyword in text.lower():
-            chosen_emojis = random.sample(emojis, 2)
-            for emoji in chosen_emojis:
-                set_message_reaction(chat_id, message_id, emoji, is_add=True)
-
-@app.post(f"/emoji_webhook")
-async def emoji_webhook(request: Request):
-    data = await request.json()
-    if 'message' in data:
-        handle_message(data['message'])
-    return {"status": "ok"}
+asyncio.run(main())

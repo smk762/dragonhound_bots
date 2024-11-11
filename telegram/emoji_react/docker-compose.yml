@@ -2,8 +2,6 @@ services:
   telegram_bot:
     build:
       context: .
-    ports:
-      - "9524:9524"
     env_file:
       - .env
     restart: always
